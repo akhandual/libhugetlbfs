@@ -22,6 +22,7 @@
 
 #include <errno.h>
 #include <string.h>
+#include <linux/falloc.h>
 
 #include "libhugetlbfs_privutils.h"
 #include "libhugetlbfs_testprobes.h"
