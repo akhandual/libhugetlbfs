@@ -36,7 +36,7 @@ int main(int argc, char **argv)
 	int is_huge, have_env, shrink_ok, have_helper;
 	unsigned long long mapping_size;
 	void *p;
-	long size = MAX(32*1024*1024, kernel_default_hugepage_size());
+	long size = MAX(1024*1024*1024, kernel_default_hugepage_size());
 
 	test_init(argc, argv);
 
