@@ -373,6 +373,10 @@ int main(int argc, char ** argv)
 	verify_dynamic_pool_support();
 	check_must_be_root();
 
+	/* Surplus pool is not supported for gigantic pages */
+	if (hpage_size == 0x40000000)
+		exit(RC_XFAIL);
+
 	if ((private_resv = kernel_has_private_reservations()) == -1)
 		FAIL("kernel_has_private_reservations() failed\n");
 
