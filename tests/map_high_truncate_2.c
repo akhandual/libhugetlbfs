@@ -52,6 +52,8 @@
 #define MAP_LENGTH	(4 * hpage_size)
 #if defined(__s390__) && __WORDSIZE == 32
 #define TRUNCATE_POINT 0x20000000UL
+#elif defined(__powerpc64__)
+#define TRUNCATE_POINT 0x80000000UL
 #else
 #define TRUNCATE_POINT 0x60000000UL
 #endif
