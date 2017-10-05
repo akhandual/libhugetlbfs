@@ -38,8 +38,12 @@
 
 /* Possibly these functions should go in the library itself.. */
 #ifdef __powerpc64__
-void *next_chunk(void *addr)
+void *next_chunk(void *addr, long hpage_size)
 {
+	/* 1GB huge pages cannot be on 256MB segments */
+	if (hpage_size == 0x40000000)
+		return PALIGN(addr, 0x10000000000UL);
+
 	if ((unsigned long)addr < 0x100000000UL)
 		/* 256M segments below 4G */
 		return PALIGN(addr, 0x10000000UL);
@@ -48,17 +52,17 @@ void *next_chunk(void *addr)
 		return PALIGN(addr, 0x10000000000UL);
 }
 #elif defined(__powerpc__) && !defined(PPC_NO_SEGMENTS)
-void *next_chunk(void *addr)
+void *next_chunk(void *addr, long hpage_size)
 {
 	return PALIGN(addr, 0x10000000UL);
 }
 #elif defined(__ia64__)
-void *next_chunk(void *addr)
+void *next_chunk(void *addr, long hpage_size)
 {
 	return PALIGN(addr, 0x8000000000000000UL);
 }
 #else
-void *next_chunk(void *addr)
+void *next_chunk(void *addr, long hpage_size)
 {
 	return PALIGN(addr, gethugepagesize());
 }
@@ -83,7 +87,7 @@ int main(int argc, char *argv[])
 	brk0 = sbrk(0);
 	verbose_printf("Initial break at %p\n", brk0);
 
-	hugemap_addr = next_chunk(brk0) + hpage_size;
+	hugemap_addr = next_chunk(brk0, hpage_size) + hpage_size;
 
 	p = mmap(hugemap_addr, hpage_size, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED,
 		 fd, 0);
@@ -99,7 +103,7 @@ int main(int argc, char *argv[])
 	if (err != 1)
 		FAIL("Mapped address is not hugepage");
 
-	newbrk = next_chunk(brk0) + getpagesize();
+	newbrk = next_chunk(brk0, hpage_size) + getpagesize();
 	err = brk((void *)newbrk);
 	if (err == -1)
 		/* Failing the brk() is an acceptable kernel response */
