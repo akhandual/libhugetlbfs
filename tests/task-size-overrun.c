@@ -33,6 +33,10 @@
 
 #define MAPS_BUF_SZ 4096
 
+#if defined(__powerpc64__)
+#define	ADDR_MARK_128TB	(1UL << 47) /* First address beyond 128TB */
+#endif
+
 static unsigned long find_last_mapped(void)
 {
 	FILE *f;
@@ -83,7 +87,7 @@ static unsigned long find_task_size(void)
 		munmap(p, getpagesize());
 		addr += getpagesize();
 #if defined(__powerpc64__)
-		if (addr > (1UL << 46) && addr < (1UL << 49))
+		if (addr > (1UL << 47) && addr < (1UL << 49))
 			addr = 1UL << 49;
 #endif
 #if defined(__s390x__)
